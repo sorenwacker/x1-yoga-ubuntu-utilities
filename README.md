@@ -16,6 +16,7 @@ This repository contains scripts and configurations to fix common issues and enh
 ### 🖥️ Display & Dock Fixes
 - **Dock watchdog** - Prevents Ubuntu Dock from disappearing
 - **OSK disabler** - Disables conflicting GNOME onscreen keyboard
+- **Brightness controls with OSD** - Visual slider for ICC-based brightness control
 - Works with OLED displays and standard LCDs
 
 ### 🛡️ Security Integration
@@ -53,6 +54,8 @@ chmod +x install.sh
    - `tablet-mode-monitor.sh`
    - `dock-watchdog.sh`
    - `disable-gnome-osk.sh`
+   - `brightness-up.sh`
+   - `brightness-down.sh`
 
 2. **Systemd Services** → `~/.config/systemd/user/`
    - `tablet-mode-monitor.service`
@@ -99,6 +102,32 @@ Disables the built-in GNOME onscreen keyboard to prevent conflicts with Onboard.
 - Runs on startup
 - Prevents GNOME keyboard from auto-showing
 - Allows Onboard to work without interference
+
+### Brightness Controls with OSD
+
+Provides visual on-screen display (OSD) slider when adjusting brightness using keyboard keys.
+
+**Features:**
+- Shows brightness slider like volume control
+- Works with ICC-based brightness control for OLED displays
+- Integrates with hardware brightness keys
+- Real-time brightness percentage display
+
+**Requirements:**
+- Custom OSD GNOME extension (GNOME 45-46)
+- bc (for floating point calculations)
+- icc-brightness or similar brightness control system
+
+**Installation:**
+```bash
+# Install Custom OSD extension
+git clone https://github.com/neuromorph/custom-osd.git \
+    ~/.local/share/gnome-shell/extensions/custom-osd@neuromorph
+glib-compile-schemas ~/.local/share/gnome-shell/extensions/custom-osd@neuromorph/schemas/
+
+# Log out and log back in, then enable
+gnome-extensions enable custom-osd@neuromorph
+```
 
 ### ClamAV Nautilus Integration
 
@@ -190,6 +219,23 @@ systemctl --user status tablet-mode-monitor.service
 Test manually:
 ```bash
 onboard
+```
+
+### Brightness OSD Not Showing
+
+Ensure Custom OSD extension is installed and enabled:
+```bash
+# Check if extension is enabled
+gnome-extensions list --enabled | grep custom-osd
+
+# If not enabled
+gnome-extensions enable custom-osd@neuromorph
+```
+
+Test brightness scripts manually:
+```bash
+~/.local/bin/brightness-up.sh
+~/.local/bin/brightness-down.sh
 ```
 
 ### ClamAV Scan Not Working
