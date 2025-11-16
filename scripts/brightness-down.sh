@@ -1,5 +1,5 @@
 #!/bin/bash
-# Decrease brightness and show notification
+# Decrease brightness and show OSD
 result=$(gdbus call --session \
     --dest org.gnome.SettingsDaemon.Power \
     --object-path /org/gnome/SettingsDaemon/Power \
@@ -8,7 +8,9 @@ result=$(gdbus call --session \
 # Extract brightness percentage
 brightness=$(echo "$result" | grep -oP '\(\K\d+' | head -1)
 
-# Show notification
+# Show OSD slider (requires Custom OSD extension)
 if [ -n "$brightness" ]; then
-    notify-send -t 1000 -h string:x-canonical-private-synchronous:brightness -h int:value:$brightness "Brightness: ${brightness}%" -i display-brightness-symbolic
+    level=$(echo "scale=2; $brightness / 100" | bc)
+    GSETTINGS_SCHEMA_DIR=$HOME/.local/share/gnome-shell/extensions/custom-osd@neuromorph/schemas \
+        gsettings set org.gnome.shell.extensions.custom-osd showosd "$RANDOM,display-brightness-symbolic,,${level}"
 fi
