@@ -1,18 +1,6 @@
 #!/bin/bash
-BR_FILE="/sys/class/backlight/intel_backlight/brightness"
-MAX=$(cat /sys/class/backlight/intel_backlight/max_brightness)
-CURRENT=$(cat $BR_FILE)
-STEP=106
-
-NEW=$((CURRENT + STEP))
-if [ $NEW -gt $MAX ]; then
-    NEW=$MAX
-fi
-
-echo $NEW > $BR_FILE
-
-# Force the watcher to update by sending a signal
-WATCHER_PID=$(pgrep -f "icc-brightness-safe watch")
-if [ -n "$WATCHER_PID" ]; then
-    kill -SIGIO $WATCHER_PID
-fi
+# Use GNOME's D-Bus interface to change brightness with OSD
+gdbus call --session \
+    --dest org.gnome.SettingsDaemon.Power \
+    --object-path /org/gnome/SettingsDaemon/Power \
+    --method org.gnome.SettingsDaemon.Power.Screen.StepUp > /dev/null 2>&1
