@@ -18,6 +18,8 @@ echo "Removing scripts..."
 rm -f ~/.local/bin/tablet-mode-monitor.sh
 rm -f ~/.local/bin/dock-watchdog.sh
 rm -f ~/.local/bin/disable-gnome-osk.sh
+rm -f ~/.local/bin/brightness-up.sh
+rm -f ~/.local/bin/brightness-down.sh
 
 # Remove systemd services
 echo "Removing systemd services..."

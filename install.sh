@@ -20,9 +20,13 @@ echo "Installing scripts..."
 cp scripts/tablet-mode-monitor.sh ~/.local/bin/
 cp scripts/dock-watchdog.sh ~/.local/bin/
 cp scripts/disable-gnome-osk.sh ~/.local/bin/
+cp scripts/brightness-up.sh ~/.local/bin/
+cp scripts/brightness-down.sh ~/.local/bin/
 chmod +x ~/.local/bin/tablet-mode-monitor.sh
 chmod +x ~/.local/bin/dock-watchdog.sh
 chmod +x ~/.local/bin/disable-gnome-osk.sh
+chmod +x ~/.local/bin/brightness-up.sh
+chmod +x ~/.local/bin/brightness-down.sh
 
 # Install systemd services
 echo "Installing systemd services..."
@@ -64,6 +68,7 @@ echo "  ✅ Tablet mode monitor (running)"
 echo "  ✅ Dock watchdog (running)"
 echo "  ✅ GNOME OSK disabler (will run on next login)"
 echo "  ✅ ClamAV Nautilus integration"
+echo "  ✅ Brightness control scripts (brightness-up.sh, brightness-down.sh)"
 echo ""
 echo "Services status:"
 systemctl --user status tablet-mode-monitor.service --no-pager | grep "Active:"
@@ -73,6 +78,8 @@ echo "Notes:"
 echo "  - Flip to tablet mode to test Onboard keyboard"
 echo "  - Right-click files in Nautilus → Scripts → 'Scan with ClamAV'"
 echo "  - For ClamAV scanning, install: sudo apt install clamav"
+echo "  - Brightness scripts require Custom OSD extension for OSD display"
+echo "  - Map brightness keys to ~/.local/bin/brightness-up.sh and brightness-down.sh"
 echo ""
 echo "View logs:"
 echo "  journalctl --user -u tablet-mode-monitor.service -f"
