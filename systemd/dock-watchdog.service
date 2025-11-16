@@ -1,0 +1,12 @@
+[Unit]
+Description=Ubuntu Dock Watchdog - Keep Dock Active
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/home/swacker/.local/bin/dock-watchdog.sh
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=default.target

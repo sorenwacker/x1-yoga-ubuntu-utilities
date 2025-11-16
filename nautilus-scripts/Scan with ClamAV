@@ -1,0 +1,52 @@
+#!/bin/bash
+# Nautilus script to scan files/folders with ClamAV
+
+# Log file for scan results
+LOG_FILE="$HOME/.clamav-scan-history.log"
+
+# Get the selected files/folders from Nautilus
+if [ -z "$NAUTILUS_SCRIPT_SELECTED_FILE_PATHS" ]; then
+    zenity --error --text="No files or folders selected!"
+    exit 1
+fi
+
+# Create a temporary file to hold the scan results
+TEMP_RESULT=$(mktemp)
+
+# Show progress dialog and run scan in background
+zenity --progress --title="Virus Scan" --text="Scanning files with ClamAV..." --pulsate --auto-close &
+ZENITY_PID=$!
+
+# Scan the selected files (handle newline-separated paths correctly)
+echo "$NAUTILUS_SCRIPT_SELECTED_FILE_PATHS" | while IFS= read -r file; do
+    clamscan -r --bell -i "$file" 2>&1 >> "$TEMP_RESULT"
+done
+
+# Close the progress dialog
+kill $ZENITY_PID 2>/dev/null
+
+# Read the scan results
+SCAN_RESULT=$(cat "$TEMP_RESULT")
+SCAN_EXIT_CODE=$?
+
+# Log the scan
+echo "=== Scan on $(date) ===" >> "$LOG_FILE"
+echo "$NAUTILUS_SCRIPT_SELECTED_FILE_PATHS" >> "$LOG_FILE"
+echo "$SCAN_RESULT" >> "$LOG_FILE"
+echo "" >> "$LOG_FILE"
+
+# Clean up temp file
+rm -f "$TEMP_RESULT"
+
+# Show results
+if echo "$SCAN_RESULT" | grep -q "Infected files: 0"; then
+    zenity --info --title="Scan Complete" --text="✅ No viruses found!\n\nAll scanned files are clean."
+elif echo "$SCAN_RESULT" | grep -q "FOUND"; then
+    zenity --warning --title="Virus Detected!" --text="⚠️ VIRUS FOUND!\n\n$SCAN_RESULT" --width=600 --height=400
+else
+    if [ -z "$SCAN_RESULT" ]; then
+        zenity --info --title="Scan Complete" --text="✅ Scan completed successfully.\n\nNo threats detected."
+    else
+        zenity --info --title="Scan Results" --text="$SCAN_RESULT" --width=600 --height=400
+    fi
+fi
