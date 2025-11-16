@@ -45,6 +45,8 @@ chmod +x install.sh
 ./install.sh
 ```
 
+**Note:** The repository is just for distribution. The `install.sh` script copies all files to proper system directories (`~/.local/bin/`, `~/.config/systemd/user/`, etc.). After installation, you can delete the cloned repository directory if desired - everything runs from system locations.
+
 ### What Gets Installed
 
 1. **Scripts** → `~/.local/bin/`
