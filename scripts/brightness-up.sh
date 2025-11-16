@@ -6,7 +6,7 @@ result=$(gdbus call --session \
     --method org.gnome.SettingsDaemon.Power.Screen.StepUp 2>&1)
 
 # Extract brightness percentage
-brightness=$(echo "$result" | grep -oP '\(\K\d+' | head -1)
+brightness=$(echo "$result" | awk -F'[(),]' '{print $2}' | tr -d ' ')
 
 # Show OSD slider (requires Custom OSD extension)
 if [ -n "$brightness" ]; then
