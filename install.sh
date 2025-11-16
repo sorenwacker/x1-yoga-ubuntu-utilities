@@ -15,18 +15,21 @@ mkdir -p ~/.config/systemd/user
 mkdir -p ~/.local/share/nautilus/scripts
 mkdir -p ~/.config/autostart
 
-# Install scripts
-echo "Installing scripts..."
+# Install user-specific scripts
+echo "Installing user-specific scripts..."
 cp scripts/tablet-mode-monitor.sh ~/.local/bin/
 cp scripts/dock-watchdog.sh ~/.local/bin/
 cp scripts/disable-gnome-osk.sh ~/.local/bin/
-cp scripts/brightness-up.sh ~/.local/bin/
-cp scripts/brightness-down.sh ~/.local/bin/
 chmod +x ~/.local/bin/tablet-mode-monitor.sh
 chmod +x ~/.local/bin/dock-watchdog.sh
 chmod +x ~/.local/bin/disable-gnome-osk.sh
-chmod +x ~/.local/bin/brightness-up.sh
-chmod +x ~/.local/bin/brightness-down.sh
+
+# Install system-wide scripts (requires sudo)
+echo "Installing system-wide brightness scripts..."
+sudo cp scripts/brightness-up.sh /usr/local/bin/
+sudo cp scripts/brightness-down.sh /usr/local/bin/
+sudo chmod +x /usr/local/bin/brightness-up.sh
+sudo chmod +x /usr/local/bin/brightness-down.sh
 
 # Install systemd services
 echo "Installing systemd services..."
@@ -79,7 +82,7 @@ echo "  - Flip to tablet mode to test Onboard keyboard"
 echo "  - Right-click files in Nautilus → Scripts → 'Scan with ClamAV'"
 echo "  - For ClamAV scanning, install: sudo apt install clamav"
 echo "  - Brightness scripts require Custom OSD extension for OSD display"
-echo "  - Map brightness keys to ~/.local/bin/brightness-up.sh and brightness-down.sh"
+echo "  - Map brightness keys to /usr/local/bin/brightness-up.sh and /usr/local/bin/brightness-down.sh"
 echo ""
 echo "View logs:"
 echo "  journalctl --user -u tablet-mode-monitor.service -f"
