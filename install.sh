@@ -67,6 +67,15 @@ fi
 # Enable Custom OSD extension (will take effect after logout/login)
 gnome-extensions enable custom-osd@neuromorph 2>/dev/null || echo "  ⚠ Extension will be enabled after logout/login"
 
+# Apply dark red theme to Custom OSD
+echo "Applying dark red theme to OSD..."
+SCHEMA_DIR="$HOME/.local/share/gnome-shell/extensions/custom-osd@neuromorph/schemas"
+gsettings --schemadir "$SCHEMA_DIR" set org.gnome.shell.extensions.custom-osd bgcolor "['0.0', '0.0', '0.0', '1.0']"     # Pure black background
+gsettings --schemadir "$SCHEMA_DIR" set org.gnome.shell.extensions.custom-osd bcolor "['0.53', '0.0', '0.0', '1.0']"    # Dark red border
+gsettings --schemadir "$SCHEMA_DIR" set org.gnome.shell.extensions.custom-osd levcolor "['1.0', '0.0', '0.0', '1.0']"   # Bright red level/slider
+gsettings --schemadir "$SCHEMA_DIR" set org.gnome.shell.extensions.custom-osd color "['1.0', '1.0', '1.0', '1.0']"      # White text/icon
+echo "  ✅ Dark red theme applied to OSD"
+
 # Set up brightness keybindings
 echo "Setting up brightness keybindings..."
 # Get current custom keybindings
@@ -122,7 +131,7 @@ echo "  ✅ Dock watchdog (running)"
 echo "  ✅ GNOME OSK disabler (will run on next login)"
 echo "  ✅ ClamAV Nautilus integration"
 echo "  ✅ Brightness control scripts (/usr/local/bin/brightness-*.sh)"
-echo "  ✅ Custom OSD extension (requires logout/login to activate)"
+echo "  ✅ Custom OSD extension with dark red theme (requires logout/login)"
 echo "  ✅ Brightness keybindings (XF86MonBrightnessUp/Down)"
 echo ""
 echo "Services status:"
