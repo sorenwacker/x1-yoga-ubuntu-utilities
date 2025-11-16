@@ -10,5 +10,9 @@ if [ $NEW -lt 0 ]; then
 fi
 
 echo $NEW > $BR_FILE
-sleep 0.1
-cat $BR_FILE > /dev/null
+
+# Force the watcher to update by sending a signal
+WATCHER_PID=$(pgrep -f "icc-brightness-safe watch")
+if [ -n "$WATCHER_PID" ]; then
+    kill -SIGIO $WATCHER_PID
+fi
