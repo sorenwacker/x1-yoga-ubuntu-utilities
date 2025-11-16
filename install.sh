@@ -53,6 +53,56 @@ NoDisplay=false
 X-GNOME-Autostart-enabled=true
 EOF
 
+# Install Custom OSD extension
+echo "Installing Custom OSD extension..."
+CUSTOM_OSD_DIR="$HOME/.local/share/gnome-shell/extensions/custom-osd@neuromorph"
+if [ ! -d "$CUSTOM_OSD_DIR" ]; then
+    git clone https://github.com/neuromorph/custom-osd.git "$CUSTOM_OSD_DIR"
+    glib-compile-schemas "$CUSTOM_OSD_DIR/schemas/"
+    echo "  ✅ Custom OSD extension installed"
+else
+    echo "  ℹ Custom OSD extension already installed"
+fi
+
+# Enable Custom OSD extension (will take effect after logout/login)
+gnome-extensions enable custom-osd@neuromorph 2>/dev/null || echo "  ⚠ Extension will be enabled after logout/login"
+
+# Set up brightness keybindings
+echo "Setting up brightness keybindings..."
+# Get current custom keybindings
+current_bindings=$(gsettings get org.gnome.settings-daemon.plugins.media-keys custom-keybindings)
+
+# Find next available slot
+slot=0
+while echo "$current_bindings" | grep -q "custom$slot"; do
+    slot=$((slot + 1))
+done
+
+# Add brightness-up keybinding
+custom_path="/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom$slot/"
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:"$custom_path" name 'Brightness Up'
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:"$custom_path" command '/usr/local/bin/brightness-up.sh'
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:"$custom_path" binding 'XF86MonBrightnessUp'
+
+# Add brightness-down keybinding
+slot=$((slot + 1))
+custom_path="/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom$slot/"
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:"$custom_path" name 'Brightness Down'
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:"$custom_path" command '/usr/local/bin/brightness-down.sh'
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:"$custom_path" binding 'XF86MonBrightnessDown'
+
+# Update the list of custom keybindings
+if [ "$current_bindings" = "@as []" ] || [ "$current_bindings" = "[]" ]; then
+    # No existing bindings
+    new_bindings="['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom$((slot-1))/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom$slot/']"
+else
+    # Add to existing bindings
+    new_bindings=$(echo "$current_bindings" | sed "s/]$/, '\/org\/gnome\/settings-daemon\/plugins\/media-keys\/custom-keybindings\/custom$((slot-1))\/', '\/org\/gnome\/settings-daemon\/plugins\/media-keys\/custom-keybindings\/custom$slot\/']/" | sed "s/\[,/[/")
+fi
+gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "$new_bindings"
+
+echo "  ✅ Brightness keybindings configured"
+
 # Enable and start services
 echo "Enabling systemd services..."
 systemctl --user daemon-reload
@@ -71,7 +121,9 @@ echo "  ✅ Tablet mode monitor (running)"
 echo "  ✅ Dock watchdog (running)"
 echo "  ✅ GNOME OSK disabler (will run on next login)"
 echo "  ✅ ClamAV Nautilus integration"
-echo "  ✅ Brightness control scripts (brightness-up.sh, brightness-down.sh)"
+echo "  ✅ Brightness control scripts (/usr/local/bin/brightness-*.sh)"
+echo "  ✅ Custom OSD extension (requires logout/login to activate)"
+echo "  ✅ Brightness keybindings (XF86MonBrightnessUp/Down)"
 echo ""
 echo "Services status:"
 systemctl --user status tablet-mode-monitor.service --no-pager | grep "Active:"
@@ -81,8 +133,8 @@ echo "Notes:"
 echo "  - Flip to tablet mode to test Onboard keyboard"
 echo "  - Right-click files in Nautilus → Scripts → 'Scan with ClamAV'"
 echo "  - For ClamAV scanning, install: sudo apt install clamav"
-echo "  - Brightness scripts require Custom OSD extension for OSD display"
-echo "  - Map brightness keys to /usr/local/bin/brightness-up.sh and /usr/local/bin/brightness-down.sh"
+echo "  - IMPORTANT: Log out and log back in to activate Custom OSD extension"
+echo "  - After login, brightness keys will show OSD slider"
 echo ""
 echo "View logs:"
 echo "  journalctl --user -u tablet-mode-monitor.service -f"
